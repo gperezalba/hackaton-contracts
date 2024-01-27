@@ -59,7 +59,9 @@ contract BasketVault is Ownable, Vault {
         address[] memory path = new address[](2);
         path[0] = token_;
         path[1] = asset();
-        uint256[] memory amounts = router.getAmountsOut(IERC20(token_).balanceOf(address(this)), path);
+        uint256 tokenBalance = IERC20(token_).balanceOf(address(this));
+        if (tokenBalance == 0) return 0;
+        uint256[] memory amounts = router.getAmountsOut(tokenBalance, path);
         return amounts[amounts.length - 1];
     }
 
@@ -100,6 +102,7 @@ contract BasketVault is Ownable, Vault {
         path[0] = asset();
         path[1] = token_;
         uint256 amountOutMin_ = 0; //TODO: use slippage tolerance
+        IERC20(asset()).approve(address(router), assets_);
         return router.swapExactTokensForTokens(assets_, amountOutMin_, path, address(this), block.timestamp);
     }
 
@@ -107,7 +110,8 @@ contract BasketVault is Ownable, Vault {
         address[] memory path = new address[](2);
         path[0] = token_;
         path[1] = asset();
-        uint256 amountInMax = 0; //TODO: use slippage tolerance
+        uint256 amountInMax = IERC20(token_).balanceOf(address(this)); //TODO: use slippage tolerance
+        IERC20(token_).approve(address(router), amountInMax);
         return router.swapTokensForExactTokens(assets_, amountInMax, path, msg.sender, block.timestamp);
     }
 

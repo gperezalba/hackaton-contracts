@@ -9,7 +9,7 @@
   "scripts": {
     "build": "forge build",
     "test": "forge test --gas-report -vvv",
-    "test:fork": "forge test --fork-url https://polygon-rpc.com/ --gas-report --chain-id 137 -vvv",
+    "test:fork": "forge test --fork-url https://rpc.ankr.com/polygon_mumbai --gas-report --chain-id 80001 -vvv",
     "coverage": "forge coverage --fork-url https://polygon-rpc.com/ --report lcov && lcov --remove lcov.info 'test/*' 'script/*' --output-file lcov.info --rc lcov_branch_coverage=1 && genhtml lcov.info -o report --branch-coverage && open report/index.html",
     "doc": "forge doc --build",
     "doc-serve": "forge doc --build --serve --port 4000",
