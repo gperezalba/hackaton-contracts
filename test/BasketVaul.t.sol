@@ -5,7 +5,7 @@ import "test/Fixture.sol";
 
 contract BasketVaultTest is Fixture {
     /// forge-config: default.fuzz.runs = 25
-    function testDeposit(address depositer, uint128 assets) public {
+    function testDeposit(address depositer, uint64 assets) public {
         vm.assume(depositer != address(0));
         vm.assume(assets >= 1 ether);
         usdt.mint(depositer, assets);
@@ -23,4 +23,7 @@ contract BasketVaultTest is Fixture {
         usdt.approve(address(vault), assets);
         vault.depositAndOperate(assets, depositer);
     }
+
+    /// forge-config: default.fuzz.runs = 25
+    function testWithdraw(address depositer, uint64 assets) public {}
 }

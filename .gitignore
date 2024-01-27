@@ -2,8 +2,8 @@
 cache/
 out/*
 
-!out/Contract.sol
-!out/Contract.sol/Contract.json
+!out/BasketVault.sol
+!out/BasketVault.sol/BasketVault.json
 
 # Ignores development broadcast logs
 !/broadcast
