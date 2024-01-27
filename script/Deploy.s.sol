@@ -4,31 +4,48 @@ pragma solidity 0.8.19;
 import {Script} from "forge-std/Script.sol";
 import {Test} from "forge-std/Test.sol";
 import {Utils} from "./Utils.s.sol";
-import {Deployer} from "src/Deployer.sol";
 import {USDT} from "src/mocks/USDT.sol";
 import {VTN} from "src/mocks/VTN.sol";
 import {DEXT} from "src/mocks/DEXT.sol";
-import {IUniswapV2Router02, IUniswapV2Factory} from "src/IUniswapV2.sol";
+import {IUniswapV2Router02, IUniswapV2Factory} from "src/interfaces/IUniswapV2.sol";
+import {BasketVault, IERC20} from "src/BasketVault.sol";
 
-contract DeployScript is Script, Test, Utils {
-    address public ms;
+contract DeployBasketVault is Script, Test, Utils {
+    IUniswapV2Router02 public router;
+    address public usdt;
+    address public vtn;
+    address public dext;
 
     function setUp() public {
-        ms = getAddressFromConfigJson(".MS");
+        router = IUniswapV2Router02(getAddressFromConfigJson(".UNISWAP_V2_ROUTER"));
+        usdt = getAddressFromConfigJson(".USDT");
+        vtn = getAddressFromConfigJson(".VTN");
+        dext = getAddressFromConfigJson(".DEXT");
     }
 
     function run() external {
         vm.startBroadcast();
 
-        Deployer deployer = deployDeployer();
+        address owner = msg.sender;
+        string memory symbol = "NBA";
+        string memory name = "NBA";
+        uint256 holdTime = 1;
+        uint256 maxActions = 100;
+
+        address[] memory tokens = new address[](2);
+        uint256[] memory weights = new uint256[](2);
+        tokens[0] = vtn;
+        tokens[1] = dext;
+        weights[0] = 3000;
+        weights[1] = 7000;
+
+        BasketVault vault =
+            new BasketVault(owner, IERC20(usdt), symbol, name, holdTime, maxActions, address(router), tokens, weights);
+
         string memory configPath = getJsonConfigPath();
-        vm.writeJson(vm.toString(address(deployer)), configPath, ".DEPLOYER");
+        vm.writeJson(vm.toString(address(vault)), configPath, ".USDT");
 
         vm.stopBroadcast();
-    }
-
-    function deployDeployer() public returns (Deployer deployer) {
-        deployer = new Deployer();
     }
 }
 
