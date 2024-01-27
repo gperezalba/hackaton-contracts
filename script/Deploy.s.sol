@@ -43,7 +43,7 @@ contract DeployBasketVault is Script, Test, Utils {
             new BasketVault(owner, IERC20(usdt), symbol, name, holdTime, maxActions, address(router), tokens, weights);
 
         string memory configPath = getJsonConfigPath();
-        vm.writeJson(vm.toString(address(vault)), configPath, ".USDT");
+        vm.writeJson(vm.toString(address(vault)), configPath, ".BASKET_VAULT");
 
         vm.stopBroadcast();
     }
