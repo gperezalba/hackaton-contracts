@@ -35,19 +35,35 @@ contract HackatonVault is ERC4626 {
         _setTokenStatusBatch(initialTokens_, true);
     }
 
-    function operateBatch() external {}
+    function operateBatch(bool[] calldata isBuy_, address[] calldata tokens_, uint256[] calldata assets_) external {
+        uint256 len = isBuy_.length;
+        require(len == tokens_.length && assets_.length == len, "lengths idiot");
+        for (uint256 i; i < len; ++i) {
+            operate(isBuy_[i], tokens_[i], assets_[i]);
+        }
+    }
 
-    function _buy(address token_, uint256 assets_, uint256 amountOutMin_) private returns (uint256[] memory amounts) {
+    function operate(bool isBuy_, address token_, uint256 assets_) public {
+        if (isBuy_) {
+            _buy(token_, assets_);
+        } else {
+            _sell(token_, assets_);
+        }
+    }
+
+    function _buy(address token_, uint256 assets_) private returns (uint256[] memory amounts) {
         address[] memory path = new address[](2);
         path[0] = asset();
         path[1] = token_;
+        uint256 amountOutMin_ = 0; //TODO: use slippage tolerance
         return router.swapExactTokensForTokens(assets_, amountOutMin_, path, address(this), block.timestamp);
     }
 
-    function _sell(address token_, uint256 assets_, uint256 amountInMax) private returns (uint256[] memory amounts) {
+    function _sell(address token_, uint256 assets_) private returns (uint256[] memory amounts) {
         address[] memory path = new address[](2);
         path[0] = token_;
         path[1] = asset();
+        uint256 amountInMax = 0; //TODO: use slippage tolerance
         return router.swapTokensForExactTokens(assets_, amountInMax, path, msg.sender, block.timestamp);
     }
 
