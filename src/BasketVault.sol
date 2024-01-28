@@ -60,6 +60,15 @@ contract BasketVault is Ownable, Vault {
         return amounts;
     }
 
+    function getBalances() public view returns (uint256[] memory) {
+        uint256 len = tokens.length;
+        uint256[] memory amounts = new uint256[](len);
+        for (uint256 i; i < len; ++i) {
+            amounts[i] = IERC20(tokens[i]).balanceOf(address(this));
+        }
+        return amounts;
+    }
+
     function operateBatch(bool[] memory isBuy_, address[] memory tokens_, uint256[] memory assets_)
         external
         onlyOwner
