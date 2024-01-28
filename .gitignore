@@ -8,6 +8,9 @@ out/*
 !out/IERC20.sol
 !out/IERC20.sol/IERC20.json
 
+!out/USDT.sol
+!out/USDT.sol/USDT.json
+
 # Ignores development broadcast logs
 !/broadcast
 /broadcast/*/31337/
