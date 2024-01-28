@@ -18,6 +18,7 @@
     "deploy:goerli": "source .env && forge script script/Deploy.s.sol --rpc-url ${ETH_GOERLI_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${ETHERSCAN_API_KEY} -vvvv —slow",
     "deploy:polygon": "source .env && forge script script/Deploy.s.sol --rpc-url ${POLYGON_MAINNET_URL} --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv —slow",
     "deploy-tokens:mumbai": "source .env && forge script script/Deploy.s.sol:DeployTokens --rpc-url ${POLYGON_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv —slow",
+    "deploy-tokens:rsk": "source .env && forge script script/Deploy.s.sol:DeployTokens --rpc-url ${RSK_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast -vvvv —slow --legacy",
     "deploy-pools:mumbai": "source .env && forge script script/Deploy.s.sol:DeployPools --rpc-url ${POLYGON_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv —slow",
     "deploy-factory:mumbai": "source .env && forge script script/Deploy.s.sol:DeployFactory --rpc-url ${POLYGON_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv —slow",
     "deploy-vault:mumbai": "source .env && forge script script/Deploy.s.sol:DeployBasketVault --rpc-url ${POLYGON_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv —slow",
