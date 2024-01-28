@@ -5,6 +5,9 @@ out/*
 !out/BasketVault.sol
 !out/BasketVault.sol/BasketVault.json
 
+!out/IERC20.sol
+!out/IERC20.sol/IERC20.json
+
 # Ignores development broadcast logs
 !/broadcast
 /broadcast/*/31337/
