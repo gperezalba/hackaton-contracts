@@ -36,8 +36,7 @@ contract BasketVaultTest is Fixture {
     }
 
     /// forge-config: default.fuzz.runs = 25
-    function testWithdrawAfterOperate(address depositer /*, uint64 assets*/ ) public {
-        uint256 assets = 100 ether;
+    function testWithdrawAfterOperate(address depositer, uint64 assets) public {
         vm.assume(depositer != address(0));
         vm.assume(assets >= 1 ether);
         usdt.mint(depositer, assets);
