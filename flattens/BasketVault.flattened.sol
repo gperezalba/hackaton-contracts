@@ -2107,6 +2107,14 @@ contract BasketVault is Ownable, Vault {
         IVaultFactory(factory).logVault(asset_, tokens_, weights_);
     }
 
+    function getTokens() public view returns (address[] memory) {
+        return tokens;
+    }
+
+    function getWeights() public view returns (uint256[] memory) {
+        return weights;
+    }
+
     function totalAssets() public view virtual override returns (uint256) {
         uint256 len = tokens.length;
         uint256 assetsSum;
