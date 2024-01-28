@@ -12,6 +12,9 @@ contract BasketVault is Ownable, Vault {
     address[] public tokens;
     uint256[] public weights;
 
+    event Buy(address indexed token, address indexed sender, uint256 amountBought, uint256 amountSold);
+    event Sell(address indexed token, address indexed sender, uint256 amountSold, uint256 amountBought);
+
     constructor(
         address initialOwner,
         address factory,
@@ -120,7 +123,8 @@ contract BasketVault is Ownable, Vault {
         path[1] = token_;
         uint256 amountOutMin_ = 0; //TODO: use slippage tolerance
         IERC20(asset()).approve(address(router), assets_);
-        return router.swapExactTokensForTokens(assets_, amountOutMin_, path, address(this), block.timestamp);
+        amounts = router.swapExactTokensForTokens(assets_, amountOutMin_, path, address(this), block.timestamp);
+        emit Buy(token_, msg.sender, amounts[amounts.length - 1], amounts[0]);
     }
 
     function _sell(address token_, uint256 assets_) internal returns (uint256[] memory amounts) {
@@ -133,10 +137,11 @@ contract BasketVault is Ownable, Vault {
         uint256[] memory expectedAmounts = router.getAmountsOut(amountInMax, path);
         uint256 expected = expectedAmounts[expectedAmounts.length - 1];
         if (expected < assets_) {
-            return router.swapTokensForExactTokens(expected, amountInMax, path, address(this), block.timestamp);
+            amounts = router.swapTokensForExactTokens(expected, amountInMax, path, address(this), block.timestamp);
         } else {
-            return router.swapTokensForExactTokens(assets_, amountInMax, path, address(this), block.timestamp);
+            amounts = router.swapTokensForExactTokens(assets_, amountInMax, path, address(this), block.timestamp);
         }
+        emit Sell(token_, msg.sender, amounts[0], amounts[amounts.length - 1]);
     }
 
     function _updateTokensAndWeights(address[] memory tokens_, uint256[] memory weights_) private {
