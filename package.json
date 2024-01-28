@@ -20,6 +20,7 @@
     "deploy-tokens:mumbai": "source .env && forge script script/Deploy.s.sol:DeployTokens --rpc-url ${POLYGON_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv —slow",
     "deploy-tokens:rsk": "source .env && forge script script/Deploy.s.sol:DeployTokens --rpc-url ${RSK_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast -vvvv —slow --legacy",
     "deploy-pools:mumbai": "source .env && forge script script/Deploy.s.sol:DeployPools --rpc-url ${POLYGON_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv —slow",
+    "deploy-pools:rsk": "source .env && forge script script/Deploy.s.sol:DeployPools --rpc-url ${RSK_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast -vvvv —slow --legacy",
     "deploy-factory:mumbai": "source .env && forge script script/Deploy.s.sol:DeployFactory --rpc-url ${POLYGON_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv —slow",
     "deploy-factory:rsk": "source .env && forge script script/Deploy.s.sol:DeployFactory --rpc-url ${RSK_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast -vvvv —slow --legacy",
     "deploy-vault:mumbai": "source .env && forge script script/Deploy.s.sol:DeployBasketVault --rpc-url ${POLYGON_TESTNET_URL} --private-key ${PRIVATE_KEY} --broadcast --verify --etherscan-api-key ${POLYGON_API_KEY} -vvvv —slow",
