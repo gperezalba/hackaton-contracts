@@ -14,6 +14,7 @@ contract BasketVault is Ownable, Vault {
 
     constructor(
         address initialOwner,
+        address factory,
         address asset_,
         string memory symbol_,
         string memory name_,
@@ -26,6 +27,7 @@ contract BasketVault is Ownable, Vault {
         _transferOwnership(initialOwner);
         router = IUniswapV2Router02(router_);
         _updateTokensAndWeights(tokens_, weights_);
+        IVaultFactory(factory).logVault(asset_, tokens_, weights_);
     }
 
     function totalAssets() public view virtual override returns (uint256) {
@@ -149,4 +151,8 @@ contract BasketVault is Ownable, Vault {
 
         require(weightsSum == 10000, "not ciento per ciento");
     }
+}
+
+interface IVaultFactory {
+    function logVault(address asset, address[] calldata tokens, uint256[] calldata weights) external;
 }

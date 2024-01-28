@@ -14,6 +14,7 @@ contract Fixture is Test, Utils {
     USDT public immutable usdt = USDT(getAddressFromConfigJson(".USDT"));
     VTN public immutable vtn = VTN(getAddressFromConfigJson(".VTN"));
     DEXT public immutable dext = DEXT(getAddressFromConfigJson(".DEXT"));
+    address public immutable factory = getAddressFromConfigJson(".VAULT_FACTORY");
     BasketVault public vault = BasketVault(getAddressFromConfigJson(".BASKET_VAULT"));
     IUniswapV2Router02 public immutable router = IUniswapV2Router02(getAddressFromConfigJson(".UNISWAP_V2_ROUTER"));
 
@@ -24,6 +25,7 @@ contract Fixture is Test, Utils {
         tokens[1] = address(dext);
         weights[0] = 3000;
         weights[1] = 7000;
-        vault = new BasketVault(msg.sender, address(usdt), "NBA", "NBA", 1, 100, address(router), tokens, weights);
+        vault =
+            new BasketVault(msg.sender, factory, address(usdt), "NBA", "NBA", 1, 100, address(router), tokens, weights);
     }
 }

@@ -9,18 +9,21 @@ import {VTN} from "src/mocks/VTN.sol";
 import {DEXT} from "src/mocks/DEXT.sol";
 import {IUniswapV2Router02, IUniswapV2Factory} from "src/interfaces/IUniswapV2.sol";
 import {BasketVault, IERC20} from "src/BasketVault.sol";
+import {VaultFactory} from "src/VaultFactory.sol";
 
 contract DeployBasketVault is Script, Test, Utils {
     IUniswapV2Router02 public router;
     address public usdt;
     address public vtn;
     address public dext;
+    address public factory;
 
     function setUp() public {
         router = IUniswapV2Router02(getAddressFromConfigJson(".UNISWAP_V2_ROUTER"));
         usdt = getAddressFromConfigJson(".USDT");
         vtn = getAddressFromConfigJson(".VTN");
         dext = getAddressFromConfigJson(".DEXT");
+        factory = getAddressFromConfigJson(".VAULT_FACTORY");
     }
 
     function run() external {
@@ -39,11 +42,25 @@ contract DeployBasketVault is Script, Test, Utils {
         weights[0] = 3000;
         weights[1] = 7000;
 
-        BasketVault vault =
-            new BasketVault(owner, address(usdt), symbol, name, holdTime, maxActions, address(router), tokens, weights);
+        BasketVault vault = new BasketVault(
+            owner, factory, address(usdt), symbol, name, holdTime, maxActions, address(router), tokens, weights
+        );
 
         string memory configPath = getJsonConfigPath();
         vm.writeJson(vm.toString(address(vault)), configPath, ".BASKET_VAULT");
+
+        vm.stopBroadcast();
+    }
+}
+
+contract DeployFactory is Script, Test, Utils {
+    function run() external {
+        vm.startBroadcast();
+
+        VaultFactory factory = new VaultFactory();
+
+        string memory configPath = getJsonConfigPath();
+        vm.writeJson(vm.toString(address(factory)), configPath, ".VAULT_FACTORY");
 
         vm.stopBroadcast();
     }
