@@ -2073,10 +2073,10 @@ contract Vault is ERC4626 {
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
-        require(lastBuyTimestamp[from] < block.timestamp + holdTime, "hold fucking sandwicher");
-        lastBuyTimestamp[to] = block.timestamp;
-        require(actionsPerBlock[block.number] <= maxActionsPerBlock, "block already traded");
-        super._beforeTokenTransfer(from, to, amount);
+        // require(lastBuyTimestamp[from] < block.timestamp + holdTime, "hold fucking sandwicher");
+        // lastBuyTimestamp[to] = block.timestamp;
+        // require(actionsPerBlock[block.number] <= maxActionsPerBlock, "block already traded");
+        // super._beforeTokenTransfer(from, to, amount);
     }
 }
 
@@ -2088,7 +2088,7 @@ contract BasketVault is Ownable, Vault {
 
     constructor(
         address initialOwner,
-        IERC20 asset_,
+        address asset_,
         string memory symbol_,
         string memory name_,
         uint256 holdTime_,
@@ -2096,7 +2096,7 @@ contract BasketVault is Ownable, Vault {
         address router_,
         address[] memory tokens_,
         uint256[] memory weights_
-    ) Vault(asset_, symbol_, name_, holdTime_, maxActionsPerBlock_) {
+    ) Vault(IERC20(asset_), symbol_, name_, holdTime_, maxActionsPerBlock_) {
         _transferOwnership(initialOwner);
         router = IUniswapV2Router02(router_);
         _updateTokensAndWeights(tokens_, weights_);
@@ -2110,6 +2110,15 @@ contract BasketVault is Ownable, Vault {
         }
         assetsSum += IERC20(asset()).balanceOf(address(this));
         return assetsSum;
+    }
+
+    function getAssets() public view returns (uint256[] memory) {
+        uint256 len = tokens.length;
+        uint256[] memory amounts = new uint256[](len);
+        for (uint256 i; i < len; ++i) {
+            amounts[i] = _getAssetsByToken(tokens[i]);
+        }
+        return amounts;
     }
 
     function operateBatch(bool[] memory isBuy_, address[] memory tokens_, uint256[] memory assets_)
@@ -2133,7 +2142,9 @@ contract BasketVault is Ownable, Vault {
         address[] memory path = new address[](2);
         path[0] = token_;
         path[1] = asset();
-        uint256[] memory amounts = router.getAmountsOut(IERC20(token_).balanceOf(address(this)), path);
+        uint256 tokenBalance = IERC20(token_).balanceOf(address(this));
+        if (tokenBalance == 0) return 0;
+        uint256[] memory amounts = router.getAmountsOut(tokenBalance, path);
         return amounts[amounts.length - 1];
     }
 
@@ -2142,6 +2153,8 @@ contract BasketVault is Ownable, Vault {
         override
     {
         _operateBeforeWithdraw(assets);
+        uint256 assetBalance = IERC20(asset()).balanceOf(address(this));
+        if (assets > assetBalance) assets = assetBalance; //TODO: teorically (xD) only 1 wei
         super._withdraw(caller, receiver, owner, assets, shares);
     }
 
@@ -2154,10 +2167,14 @@ contract BasketVault is Ownable, Vault {
     }
 
     function _operateBeforeWithdraw(uint256 assets) internal {
-        uint256 len = tokens.length;
-        for (uint256 i; i < len; ++i) {
-            uint256 weightedAssets = assets * weights[i] / 10000;
-            _sell(tokens[i], weightedAssets);
+        uint256 currentBalance = IERC20(asset()).balanceOf(address(this));
+        if (currentBalance < assets) {
+            assets -= currentBalance;
+            uint256 len = tokens.length;
+            for (uint256 i; i < len; ++i) {
+                uint256 weightedAssets = assets * weights[i] / 10000;
+                _sell(tokens[i], weightedAssets);
+            }
         }
     }
 
@@ -2174,6 +2191,7 @@ contract BasketVault is Ownable, Vault {
         path[0] = asset();
         path[1] = token_;
         uint256 amountOutMin_ = 0; //TODO: use slippage tolerance
+        IERC20(asset()).approve(address(router), assets_);
         return router.swapExactTokensForTokens(assets_, amountOutMin_, path, address(this), block.timestamp);
     }
 
@@ -2181,8 +2199,16 @@ contract BasketVault is Ownable, Vault {
         address[] memory path = new address[](2);
         path[0] = token_;
         path[1] = asset();
-        uint256 amountInMax = 0; //TODO: use slippage tolerance
-        return router.swapTokensForExactTokens(assets_, amountInMax, path, msg.sender, block.timestamp);
+        uint256 amountInMax = IERC20(token_).balanceOf(address(this)); //TODO: use slippage tolerance
+        IERC20(token_).approve(address(router), amountInMax);
+        //Note: sorry for this:
+        uint256[] memory expectedAmounts = router.getAmountsOut(amountInMax, path);
+        uint256 expected = expectedAmounts[expectedAmounts.length - 1];
+        if (expected < assets_) {
+            return router.swapTokensForExactTokens(expected, amountInMax, path, address(this), block.timestamp);
+        } else {
+            return router.swapTokensForExactTokens(assets_, amountInMax, path, address(this), block.timestamp);
+        }
     }
 
     function _updateTokensAndWeights(address[] memory tokens_, uint256[] memory weights_) private {

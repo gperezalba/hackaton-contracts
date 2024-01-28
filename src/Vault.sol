@@ -26,9 +26,9 @@ contract Vault is ERC4626 {
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal override {
-        require(lastBuyTimestamp[from] < block.timestamp + holdTime, "hold fucking sandwicher");
-        lastBuyTimestamp[to] = block.timestamp;
-        require(actionsPerBlock[block.number] <= maxActionsPerBlock, "block already traded");
-        super._beforeTokenTransfer(from, to, amount);
+        // require(lastBuyTimestamp[from] < block.timestamp + holdTime, "hold fucking sandwicher");
+        // lastBuyTimestamp[to] = block.timestamp;
+        // require(actionsPerBlock[block.number] <= maxActionsPerBlock, "block already traded");
+        // super._beforeTokenTransfer(from, to, amount);
     }
 }
